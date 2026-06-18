@@ -23,7 +23,15 @@ a {
 }
 
 // title → Instrument Serif
-.article-title,
+.article-title {
+  font-family: var(--headerFont);
+  font-weight: 400;
+  color: #272727;
+  font-size: 3.25rem;
+  line-height: 1.12;
+  margin-bottom: 1.75rem;
+}
+
 article > h1 {
   font-family: var(--headerFont);
   font-weight: 400;

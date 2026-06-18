@@ -1,3 +1,7 @@
+---
+title: Thank Who for the Music - How Modes Of Music Access Shape Our Identities, Relationships And Cultures
+---
+
 ## Introduction
 
 For most of history we experienced exclusively *live* music in amphitheatres and domestic settings alike. With the introduction of recording and distribution, music shifted from an ephemeral experience into something you could own.
