@@ -1,0 +1,457 @@
+@use "./variables.scss" as *;
+
+// ============================================================================
+//  camcam.zip — custom theme
+//  Palette : paper #f2f2f2 / ink #272727
+//  Fonts   : Instrument Serif (titles) · DM Sans (body / bold subheads) · Menlo
+//            (captions, breadcrumbs, site title, file tree, table of contents)
+//  Layout  : 25% left rail · 50% text · 25% right "blowout" image margin
+//  NOTE    : the geometry knobs (percentages, leader-line length, cm padding)
+//            are grouped under :root so they're easy to tune after previewing
+//            with `npx quartz build --serve`.
+// ============================================================================
+
+:root {
+  --paper: #f2f2f2;
+  --ink: #272727;
+
+  // stroke weight for borders + blowout leader lines.
+  // sits between DM Sans Regular and Bold visually.
+  --stroke: 1.5px;
+
+  // fonts
+  --headerFont: "Instrument Serif", "DM Sans", serif;
+  --bodyFont: "DM Sans", system-ui, -apple-system, sans-serif;
+  --codeFont: "Menlo", ui-monospace, "SFMono-Regular", "Cascadia Mono", monospace;
+
+  // ---- layout knobs (tune these) ----
+  --rail-width: 25%; // left sidebar (site title, tree, ToC)
+  --figure-margin: 34%; // share of the text column reserved for blowout images
+  --figure-width: 30%; // width of a blowout image within that reserved area
+  --leader-length: 14%; // length of the connector line from text -> image
+  --album-pad: 1.5cm; // padding inside each album-collection box
+}
+
+// ----------------------------------------------------------------------------
+//  Base colours / fonts
+// ----------------------------------------------------------------------------
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--bodyFont);
+  font-weight: 400;
+}
+
+p,
+li,
+ol,
+ul,
+td,
+tr,
+a,
+text {
+  color: var(--ink);
+}
+
+// links: monochrome, underline on hover
+a {
+  color: var(--ink);
+  font-weight: 500;
+  &:hover {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
+strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+// ----------------------------------------------------------------------------
+//  Typography — title vs subheadings
+// ----------------------------------------------------------------------------
+// Page / article title -> Instrument Serif
+.article-title,
+.page > article > h1,
+article > h1 {
+  font-family: var(--headerFont);
+  font-weight: 400;
+  color: var(--ink);
+  font-size: 2.8rem;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+// Subheadings -> DM Sans Bold
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--bodyFont);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+// ----------------------------------------------------------------------------
+//  Menlo zones: site title, breadcrumbs, captions, file tree, content meta
+// ----------------------------------------------------------------------------
+.page-title,
+.page-title a,
+.breadcrumb-container,
+.breadcrumb-element,
+.content-meta,
+.explorer,
+.explorer ul,
+.explorer li,
+.explorer a,
+#explorer-content,
+figcaption,
+p > img + em,
+article p:has(> img) em {
+  font-family: var(--codeFont);
+}
+
+.page-title,
+.page-title a {
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.breadcrumb-container {
+  font-size: 0.8rem;
+  color: var(--ink);
+}
+
+// file tree: tighter, code-like
+.explorer {
+  font-size: 0.85rem;
+  ul,
+  li,
+  a {
+    font-weight: 500;
+  }
+}
+
+// captions
+p > img + em,
+article p:has(> img) em,
+figcaption {
+  display: block;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  font-style: normal;
+  color: var(--ink);
+  margin-top: 0.4rem;
+}
+
+// ----------------------------------------------------------------------------
+//  Table of contents (bottom-left) — Menlo Bold, interactive
+// ----------------------------------------------------------------------------
+.toc {
+  font-family: var(--codeFont);
+  font-weight: 700;
+
+  & .toc-title,
+  & button,
+  & h3,
+  & a,
+  & li {
+    font-family: var(--codeFont);
+    font-weight: 700;
+  }
+
+  // render the full list — no inner scrollbar, no fade mask
+  & ul,
+  & ul.overflow {
+    list-style: none;
+    padding-left: 0.4rem;
+    margin: 0;
+    max-height: none;
+    overflow: visible;
+    mask-image: none;
+  }
+
+  & li {
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  & a {
+    color: var(--ink);
+    opacity: 0.65;
+    transition:
+      opacity 0.15s ease,
+      border-color 0.15s ease;
+    border-left: var(--stroke) solid transparent;
+    padding-left: 0.5rem;
+    display: inline-block;
+
+    &:hover,
+    &.in-view {
+      opacity: 1;
+      border-left-color: var(--ink);
+      text-decoration: none;
+    }
+  }
+}
+
+// ----------------------------------------------------------------------------
+//  Borders / strokes -> ink, weight = --stroke
+// ----------------------------------------------------------------------------
+hr {
+  background-color: var(--ink);
+  height: var(--stroke);
+}
+
+blockquote {
+  border-left: var(--stroke) solid var(--ink);
+  color: var(--ink);
+}
+
+// ----------------------------------------------------------------------------
+//  Page grid: 25% rail | 75% content (text + right image margin)
+// ----------------------------------------------------------------------------
+.page {
+  max-width: 1500px;
+  margin: 0 auto;
+
+  & > #quartz-body {
+    @media all and ($desktop) {
+      grid-template-columns: var(--rail-width) 1fr;
+      grid-template-areas:
+        "grid-sidebar-left grid-header"
+        "grid-sidebar-left grid-center"
+        "grid-sidebar-left grid-footer";
+      column-gap: 2.5rem;
+    }
+
+    // right sidebar removed — the right margin is owned by blowout images
+    & .sidebar.right {
+      display: none;
+    }
+
+    // left rail: site title, file tree, then ToC — all grouped at the top.
+    // grows with content so nothing needs an inner scrollbar.
+    & .sidebar.left {
+      @media all and ($desktop) {
+        justify-content: flex-start;
+        height: auto;
+        max-height: none;
+        overflow: visible;
+
+        & .toc {
+          margin-top: 1.5rem;
+        }
+      }
+    }
+  }
+}
+
+// kill the inner scroll / fade on the left-rail lists (tree + ToC)
+.explorer ul.overflow,
+.explorer ul,
+#explorer-content ul {
+  max-height: none;
+  overflow: visible;
+  mask-image: none;
+}
+
+// ----------------------------------------------------------------------------
+//  Blowout images: pulled into the right margin, leader line back to the text
+// ----------------------------------------------------------------------------
+@media all and ($desktop) {
+  // reserve the right portion of the content column for figures
+  .center > article {
+    position: relative;
+    padding-right: var(--figure-margin);
+  }
+
+  // a standalone image paragraph (image + its caption) becomes a margin figure
+  .center > article p:has(img) {
+    float: right;
+    clear: right;
+    width: var(--figure-width);
+    // pull the figure out of the text column into the reserved right margin
+    margin: 0.2rem calc(-1 * var(--figure-margin)) 2rem 0;
+    position: relative;
+
+    // the "blowout" leader line: from the figure's left edge back toward text
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0.6rem;
+      right: 100%;
+      width: var(--leader-length);
+      height: 0;
+      border-top: var(--stroke) solid var(--ink);
+    }
+  }
+}
+
+// image itself: tight rectangular border, no padding / no margin / no radius.
+// height capped at 60% of the viewport.
+.center > article p:has(img) img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 60vh;
+  margin: 0;
+  padding: 0;
+  border: var(--stroke) solid var(--ink);
+  border-radius: 0;
+  content-visibility: auto;
+}
+
+// neutralise Quartz's default caption nudge inside a blowout figure
+.center > article p:has(img) em {
+  transform: none;
+}
+
+// ----------------------------------------------------------------------------
+//  Album collections (the 2×3 artwork tables): bordered "blowout" boxes
+// ----------------------------------------------------------------------------
+// styled on the <table> itself so it works with or without a .table-container wrapper
+.center > article table:has(img) {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  border: var(--stroke) solid var(--ink);
+  border-collapse: separate;
+  border-spacing: 0;
+  padding: var(--album-pad);
+  margin: 2rem 0;
+  box-sizing: border-box;
+
+  & tr,
+  & td,
+  & th {
+    border: none;
+    padding: 0.6rem;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  // uniform album art: equal squares, evenly spaced
+  & img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    margin: 0;
+    padding: 0;
+    border: var(--stroke) solid var(--ink);
+    border-radius: 0;
+  }
+}
+
+// don't let the table wrapper clip the box border or force a scrollbar
+.center > article .table-container:has(img) {
+  overflow: visible;
+}
+
+// ----------------------------------------------------------------------------
+//  Explorer — literal ASCII tree branches (├─ │ └─)
+// ----------------------------------------------------------------------------
+.explorer {
+  font-size: 0.85rem;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  // every nested list draws a vertical trunk line
+  ul ul {
+    margin-left: 0.55ch;
+    padding-left: 1.1ch;
+    border-left: var(--stroke) solid var(--ink);
+  }
+
+  li {
+    position: relative;
+    padding-left: 1.4ch;
+  }
+
+  // branch connector for each entry
+  li::before {
+    content: "├─";
+    position: absolute;
+    left: -0.2ch;
+    color: var(--ink);
+    font-family: var(--codeFont);
+    white-space: pre;
+  }
+
+  // last child in a list uses the closing branch
+  li:last-child::before {
+    content: "└─";
+  }
+
+  // tighten the folder/file rows so the ascii art lines up
+  .folder-outer,
+  .folder-container,
+  li > a,
+  li > .folder-container > button,
+  li > button {
+    font-family: var(--codeFont);
+    font-weight: 500;
+    line-height: 1.6;
+  }
+}
+
+// ----------------------------------------------------------------------------
+//  Collapsible body headers — click a heading to fold its section
+// ----------------------------------------------------------------------------
+.center > article .collapsible-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+.center > article .collapsible-header::before {
+  content: "▾";
+  display: inline-block;
+  width: 1em;
+  margin-left: -1.2em;
+  font-size: 0.7em;
+  color: var(--ink);
+  transition: transform 0.15s ease;
+  transform: translateY(-0.15em);
+}
+
+.center > article .collapsible-header.collapsed::before {
+  transform: translateY(-0.15em) rotate(-90deg);
+}
+
+.center > article .section-hidden {
+  display: none !important;
+}
+
+// ----------------------------------------------------------------------------
+//  Responsive: on tablet / mobile, images sit inline (no margin float)
+// ----------------------------------------------------------------------------
+@media all and not ($desktop) {
+  .center > article {
+    padding-right: 0;
+  }
+  .center > article p:has(> img) {
+    float: none;
+    width: 100%;
+    margin: 1.5rem 0;
+    &::before {
+      display: none;
+    }
+  }
+  .center > article p:has(> img) img {
+    max-width: 100%;
+  }
+}

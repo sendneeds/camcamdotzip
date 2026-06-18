@@ -95,6 +95,12 @@ export default (() => {
         <meta name="description" content={description} />
         <meta name="generator" content="Quartz" />
 
+        {/* camcam.zip custom fonts — guarantee DM Sans 400/500/700 + Instrument Serif */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Instrument+Serif&display=swap"
+        />
+
         {css.map((resource) => CSSResourceToStyleElement(resource, true))}
         {js
           .filter((resource) => resource.loadTime === "beforeDOMReady")
@@ -106,6 +112,9 @@ export default (() => {
             return resource
           }
         })}
+
+        {/* camcam.zip — interactive ToC (title + figures) augmentation */}
+        <script src={joinSegments(baseDir, "static/blowout.js")} defer />
       </head>
     )
   }
