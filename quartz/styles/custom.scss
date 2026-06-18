@@ -167,10 +167,15 @@ figcaption {
     font-weight: 700;
   }
 
-  & ul {
+  // render the full list — no inner scrollbar, no fade mask
+  & ul,
+  & ul.overflow {
     list-style: none;
     padding-left: 0.4rem;
     margin: 0;
+    max-height: none;
+    overflow: visible;
+    mask-image: none;
   }
 
   & li {
@@ -194,12 +199,6 @@ figcaption {
       border-left-color: var(--ink);
       text-decoration: none;
     }
-  }
-
-  // image / figure entries injected by blowout.js
-  & li.toc-figure > a::before {
-    content: "▣ ";
-    opacity: 0.7;
   }
 }
 
@@ -238,17 +237,30 @@ blockquote {
       display: none;
     }
 
-    // left rail: title + tree at top, ToC pinned toward the bottom
+    // left rail: site title, file tree, then ToC — all grouped at the top.
+    // grows with content so nothing needs an inner scrollbar.
     & .sidebar.left {
       @media all and ($desktop) {
         justify-content: flex-start;
+        height: auto;
+        max-height: none;
+        overflow: visible;
+
         & .toc {
-          margin-top: auto; // push ToC to the bottom of the rail
-          padding-top: 2rem;
+          margin-top: 1.5rem;
         }
       }
     }
   }
+}
+
+// kill the inner scroll / fade on the left-rail lists (tree + ToC)
+.explorer ul.overflow,
+.explorer ul,
+#explorer-content ul {
+  max-height: none;
+  overflow: visible;
+  mask-image: none;
 }
 
 // ----------------------------------------------------------------------------
@@ -262,7 +274,7 @@ blockquote {
   }
 
   // a standalone image paragraph (image + its caption) becomes a margin figure
-  .center > article p:has(> img) {
+  .center > article p:has(img) {
     float: right;
     clear: right;
     width: var(--figure-width);
@@ -283,10 +295,14 @@ blockquote {
   }
 }
 
-// image itself: tight rectangular border, no padding / no margin / no radius
-.center > article p:has(> img) img {
+// image itself: tight rectangular border, no padding / no margin / no radius.
+// height capped at 60% of the viewport.
+.center > article p:has(img) img {
   display: block;
-  width: 100%;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 60vh;
   margin: 0;
   padding: 0;
   border: var(--stroke) solid var(--ink);
@@ -295,43 +311,129 @@ blockquote {
 }
 
 // neutralise Quartz's default caption nudge inside a blowout figure
-.center > article p:has(> img) em {
+.center > article p:has(img) em {
   transform: none;
 }
 
 // ----------------------------------------------------------------------------
 //  Album collections (the 2×3 artwork tables): bordered "blowout" boxes
 // ----------------------------------------------------------------------------
-.center > article .table-container:has(img) {
+// styled on the <table> itself so it works with or without a .table-container wrapper
+.center > article table:has(img) {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
   border: var(--stroke) solid var(--ink);
+  border-collapse: separate;
+  border-spacing: 0;
   padding: var(--album-pad);
   margin: 2rem 0;
-  overflow: visible;
-
-  & > table {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    table-layout: fixed;
-  }
+  box-sizing: border-box;
 
   & tr,
   & td,
   & th {
     border: none;
-    padding: 0.5rem;
+    padding: 0.6rem;
     text-align: center;
     vertical-align: middle;
   }
 
+  // uniform album art: equal squares, evenly spaced
   & img {
+    display: block;
     width: 100%;
     height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
     margin: 0;
     padding: 0;
     border: var(--stroke) solid var(--ink);
     border-radius: 0;
   }
+}
+
+// don't let the table wrapper clip the box border or force a scrollbar
+.center > article .table-container:has(img) {
+  overflow: visible;
+}
+
+// ----------------------------------------------------------------------------
+//  Explorer — literal ASCII tree branches (├─ │ └─)
+// ----------------------------------------------------------------------------
+.explorer {
+  font-size: 0.85rem;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  // every nested list draws a vertical trunk line
+  ul ul {
+    margin-left: 0.55ch;
+    padding-left: 1.1ch;
+    border-left: var(--stroke) solid var(--ink);
+  }
+
+  li {
+    position: relative;
+    padding-left: 1.4ch;
+  }
+
+  // branch connector for each entry
+  li::before {
+    content: "├─";
+    position: absolute;
+    left: -0.2ch;
+    color: var(--ink);
+    font-family: var(--codeFont);
+    white-space: pre;
+  }
+
+  // last child in a list uses the closing branch
+  li:last-child::before {
+    content: "└─";
+  }
+
+  // tighten the folder/file rows so the ascii art lines up
+  .folder-outer,
+  .folder-container,
+  li > a,
+  li > .folder-container > button,
+  li > button {
+    font-family: var(--codeFont);
+    font-weight: 500;
+    line-height: 1.6;
+  }
+}
+
+// ----------------------------------------------------------------------------
+//  Collapsible body headers — click a heading to fold its section
+// ----------------------------------------------------------------------------
+.center > article .collapsible-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+.center > article .collapsible-header::before {
+  content: "▾";
+  display: inline-block;
+  width: 1em;
+  margin-left: -1.2em;
+  font-size: 0.7em;
+  color: var(--ink);
+  transition: transform 0.15s ease;
+  transform: translateY(-0.15em);
+}
+
+.center > article .collapsible-header.collapsed::before {
+  transform: translateY(-0.15em) rotate(-90deg);
+}
+
+.center > article .section-hidden {
+  display: none !important;
 }
 
 // ----------------------------------------------------------------------------

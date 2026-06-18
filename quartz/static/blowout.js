@@ -1,11 +1,15 @@
 /*
  * blowout.js — camcam.zip
- * Augments the Quartz table of contents so it lists the page TITLE and every
- * blowout IMAGE (figure) in addition to the headings, and wires up scroll-spy
- * highlighting for those figure entries. Headings are already handled by Quartz.
  *
- * Defensive by design: everything is wrapped in try/catch and feature-detected
- * so a failure here can never break page rendering. Re-runs on Quartz SPA nav.
+ *  1. Adds the page TITLE to the top of the table of contents (headings are
+ *     already handled by Quartz; individual figures are intentionally NOT
+ *     listed so the ToC stays short and scrollbar-free).
+ *  2. Makes body headings (h2–h6) collapsible: click a heading to fold every
+ *     element beneath it up to the next heading of the same or higher level.
+ *     Nesting is respected.
+ *
+ * Defensive by design: wrapped in try/catch + feature-detected so it can never
+ * break page rendering. Re-runs on Quartz SPA navigation.
  */
 ;(function () {
   function truncate(s, n) {
@@ -13,72 +17,88 @@
     return s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s
   }
 
-  function enhance() {
-    try {
-      const article = document.querySelector(".center > article, article")
-      if (!article) return
+  function headingLevel(el) {
+    return parseInt(el.tagName.slice(1), 10)
+  }
 
-      const toc = document.querySelector(".toc")
-      // find the list Quartz renders inside the ToC
-      const list = toc && (toc.querySelector("ul") || toc.querySelector("ol"))
-      if (!toc || !list) return
+  function getArticle() {
+    return document.querySelector(".center > article") || document.querySelector("article")
+  }
 
-      // avoid double-injecting on re-runs
-      list.querySelectorAll("li.toc-figure, li.toc-page-title").forEach((el) => el.remove())
+  // ---- 1) Title entry in the ToC -------------------------------------------
+  function addTitleToToc() {
+    const article = getArticle()
+    if (!article) return
+    const toc = document.querySelector(".toc")
+    const list = toc && (toc.querySelector("ul") || toc.querySelector("ol"))
+    if (!list) return
 
-      // 1) title entry at the top of the ToC
-      const titleEl = article.querySelector("h1, .article-title")
-      if (titleEl) {
-        if (!titleEl.id) titleEl.id = "page-top"
-        const li = document.createElement("li")
-        li.className = "toc-page-title depth-0"
-        const a = document.createElement("a")
-        a.href = "#" + titleEl.id
-        a.textContent = truncate(titleEl.textContent, 40)
-        li.appendChild(a)
-        list.insertBefore(li, list.firstChild)
+    // clean up previous injections / stale figure entries
+    list.querySelectorAll("li.toc-page-title, li.toc-figure").forEach((el) => el.remove())
+
+    const titleEl = document.querySelector(".article-title") || article.querySelector("h1")
+    if (!titleEl) return
+    if (!titleEl.id) titleEl.id = "page-top"
+
+    const li = document.createElement("li")
+    li.className = "toc-page-title depth-0"
+    const a = document.createElement("a")
+    a.href = "#" + titleEl.id
+    a.textContent = truncate(titleEl.textContent, 40)
+    li.appendChild(a)
+    list.insertBefore(li, list.firstChild)
+  }
+
+  // ---- 2) Collapsible headings ---------------------------------------------
+  function applyVisibility(article) {
+    const collapsedStack = [] // levels of currently-collapsed ancestors
+    for (const el of Array.from(article.children)) {
+      const isHeading = /^H[1-6]$/.test(el.tagName)
+      if (isHeading) {
+        const lvl = headingLevel(el)
+        while (collapsedStack.length && collapsedStack[collapsedStack.length - 1] >= lvl) {
+          collapsedStack.pop()
+        }
+        // the heading itself is hidden only if nested in a collapsed ancestor
+        el.classList.toggle("section-hidden", collapsedStack.length > 0)
+        if (el.classList.contains("collapsed")) collapsedStack.push(lvl)
+      } else {
+        el.classList.toggle("section-hidden", collapsedStack.length > 0)
       }
-
-      // 2) figure entries — one per blowout image paragraph
-      const figures = article.querySelectorAll("p:has(> img)")
-      const observed = []
-      figures.forEach((fig, i) => {
-        if (!fig.id) fig.id = "figure-" + (i + 1)
-        const cap = fig.querySelector("em")
-        const label = cap ? truncate(cap.textContent, 38) : "Figure " + (i + 1)
-
-        const li = document.createElement("li")
-        li.className = "toc-figure depth-1"
-        const a = document.createElement("a")
-        a.href = "#" + fig.id
-        a.textContent = label
-        a.dataset.figureId = fig.id
-        li.appendChild(a)
-        list.appendChild(li)
-        observed.push({ fig, a })
-      })
-
-      // 3) scroll-spy for the figure entries
-      if ("IntersectionObserver" in window && observed.length) {
-        const map = new Map(observed.map((o) => [o.fig, o.a]))
-        const io = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((e) => {
-              const a = map.get(e.target)
-              if (a) a.classList.toggle("in-view", e.isIntersecting)
-            })
-          },
-          { rootMargin: "-20% 0px -70% 0px" },
-        )
-        observed.forEach((o) => io.observe(o.fig))
-      }
-    } catch (err) {
-      /* never let styling JS break the page */
-      console.warn("blowout.js:", err)
     }
   }
 
-  // initial load + Quartz client-side navigation
+  function setupCollapsibles() {
+    const article = getArticle()
+    if (!article) return
+    const headings = article.querySelectorAll(":scope > h2, :scope > h3, :scope > h4, :scope > h5, :scope > h6")
+    headings.forEach((h) => {
+      if (h.dataset.collapsible) return
+      h.dataset.collapsible = "1"
+      h.classList.add("collapsible-header")
+      h.addEventListener("click", (e) => {
+        // let the heading's own anchor link work normally
+        if (e.target.closest("a")) return
+        h.classList.toggle("collapsed")
+        applyVisibility(article)
+      })
+    })
+    applyVisibility(article)
+  }
+
+  function enhance() {
+    try {
+      addTitleToToc()
+    } catch (err) {
+      console.warn("blowout.js (toc):", err)
+    }
+    try {
+      setupCollapsibles()
+    } catch (err) {
+      console.warn("blowout.js (collapsibles):", err)
+    }
+  }
+
   if (document.readyState !== "loading") enhance()
   else document.addEventListener("DOMContentLoaded", enhance)
   document.addEventListener("nav", enhance)
