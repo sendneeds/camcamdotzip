@@ -50,7 +50,6 @@ Our collections might communicate more about us than just our taste in music. Pi
 | ![[ariana-grande-my-everything-2014-album-artwork-1.png]] | ![[lady-gaga-mayhem-1.png]] | ![[lana-del-rey-did-you-know-that-theres-a-tunnel-under-ocean-blvd-1.png]] |
 | --------------------------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------- |
 
-
 | ![[radioheadokcomputer.png]] | ![[tame-impala-currents.png]] | ![[the-strokes-is-this-it-cover.png]] |
 | ---------------------------- | ------------------------------- | --------------------------------------- |
 *Figure 1. Album artwork retrieved from Wikimedia Commons. 

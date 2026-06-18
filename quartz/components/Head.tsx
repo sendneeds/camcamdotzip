@@ -95,6 +95,11 @@ export default (() => {
         <meta name="description" content={description} />
         <meta name="generator" content="Quartz" />
 
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&family=Instrument+Serif&display=swap"
+        />
+
         {css.map((resource) => CSSResourceToStyleElement(resource, true))}
         {js
           .filter((resource) => resource.loadTime === "beforeDOMReady")
@@ -106,6 +111,7 @@ export default (() => {
             return resource
           }
         })}
+        <script src={joinSegments(baseDir, "static/reading-progress.js")} defer />
       </head>
     )
   }
