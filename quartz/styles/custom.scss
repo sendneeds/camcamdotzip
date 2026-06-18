@@ -84,7 +84,7 @@ article img {
 // album collections: two floating rows, tight columns / wider row spacing
 article .table-container:has(img) {
   --album-col-gap: 0.25rem;
-  --album-row-gap: 1.25rem;
+  --album-row-gap: 0.65rem;
   border: none;
   padding: 0;
   margin: 0 auto;
@@ -127,6 +127,18 @@ article table:has(img) {
   }
 }
 
+// figure caption directly below album collections — same Menlo style as image captions
+article .table-container:has(img) + p > em,
+article .table-container:has(img) + p em {
+  font-family: var(--codeFont);
+  display: block;
+  font-size: 0.85rem;
+  font-style: normal;
+  text-align: center;
+  color: #272727;
+  margin: 0.35rem auto 0;
+}
+
 // reference list + body: keep author names and italics at full contrast
 article strong,
 article p > strong {
@@ -156,7 +168,7 @@ article p {
 // reading progress — vertical, top-right, centred, max 70vh, labelled in Menlo
 .reading-progress {
   position: fixed;
-  top: 44%;
+  top: 50%;
   right: 2rem;
   transform: translateY(-50%);
   max-height: 70vh;
@@ -195,7 +207,7 @@ article p {
   white-space: nowrap;
   text-align: right;
   line-height: 1;
-  transform: translateY(3px); // sit the hyphen on the break line
+  transform: translateY(-1px); // nudge label (and hyphen) slightly higher in the break
   padding-right: 0.45rem;
 }
 

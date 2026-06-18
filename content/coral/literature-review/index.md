@@ -52,7 +52,8 @@ Our collections might communicate more about us than just our taste in music. Pi
 
 | ![[radioheadokcomputer.png]] | ![[tame-impala-currents.png]] | ![[the-strokes-is-this-it-cover.png]] |
 | ---------------------------- | ------------------------------- | --------------------------------------- |
-*Figure 1. Album artwork retrieved from Wikimedia Commons. 
+
+*Figure 1. Album artwork retrieved from Wikimedia Commons.*
 
 "We assume that we can get to know someone through their tastes...eyeing someone's book and record shelves the first time we visit them" (Frith, 1996, p.5)
 
