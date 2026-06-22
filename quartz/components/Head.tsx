@@ -111,7 +111,8 @@ export default (() => {
             return resource
           }
         })}
-        <script src={joinSegments(baseDir, "static/reading-progress.js")} defer />
+        <script src={joinSegments(baseDir, "static/nav-tree.js")} defer />
+        <script src={joinSegments(baseDir, "static/blowout.js")} defer />
       </head>
     )
   }

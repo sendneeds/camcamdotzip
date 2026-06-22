@@ -21,7 +21,7 @@ configuration:
         weights: [400]
       body:
         name: DM Sans
-        weights: [400, 700]
+        weights: [400, 600, 700]
       code: IBM Plex Mono
     colors:
       lightMode:
@@ -212,7 +212,7 @@ plugins:
       priority: 35
       group: toolbar
   - source: github:quartz-community/breadcrumbs
-    enabled: true
+    enabled: false
     layout:
       position: beforeBody
       priority: 5

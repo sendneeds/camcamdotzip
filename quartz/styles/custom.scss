@@ -1,16 +1,28 @@
 @use "./variables.scss" as *;
 
-// camcam.zip — fonts, palette, images
+// camcam.zip — fonts, palette, images, ascii nav tree, figure captions
 
 :root {
   --headerFont: "Instrument Serif", "DM Sans", serif;
   --bodyFont: "DM Sans", system-ui, -apple-system, sans-serif;
   --codeFont: Menlo, ui-monospace, "SFMono-Regular", "Cascadia Mono", monospace;
+
+  --ink: #272727;
+  --paper: #f2f2f2;
+  --read: #bbe1ef; // colour for sections already scrolled past
+
+  // layout geometry
+  --col: 620px; // text column max width (title, meta, body all share this)
+  --tree-reserve: 17rem; // left space kept clear for the fixed ascii tree
+  --fig-space: 2rem; // right breathing room (matches footer side padding)
+  --cap-lh: 1.25rem; // caption line-height
+  --cap-pad: calc(var(--cap-lh) * 0.5); // half the original box padding
+  --cap-border: rgba(39, 39, 39, 0.4); // 50% of previous border opacity
 }
 
 body {
-  background-color: #f2f2f2;
-  color: #272727;
+  background-color: var(--paper);
+  color: var(--ink);
   font-family: var(--bodyFont);
   font-weight: 400;
 }
@@ -19,66 +31,163 @@ p,
 li,
 td,
 a {
-  color: #272727;
+  color: var(--ink);
 }
 
-// title → Instrument Serif
-.article-title {
+// ----------------------------------------------------------------------------
+//  Title + headings (centred)
+// ----------------------------------------------------------------------------
+.article-title,
+h1.article-title {
   font-family: var(--headerFont);
   font-weight: 400;
-  color: #272727;
-  font-size: 3.25rem;
-  line-height: 1.12;
-  margin-bottom: 1.75rem;
+  color: var(--ink);
+  font-size: 3rem;
+  line-height: 1.1;
+  margin: 0 0 0.75rem 0;
+  text-align: center;
+  max-width: none;
+}
+
+.page > #quartz-body .page-header {
+  padding-top: 1.5rem; // match footer vertical padding
 }
 
 article > h1 {
   font-family: var(--headerFont);
   font-weight: 400;
-  color: #272727;
+  color: var(--ink);
+  line-height: 1.1;
 }
 
-// subheadings → DM Sans Bold
-h2,
-h3,
-h4,
-h5,
-h6 {
+article h2 {
   font-family: var(--bodyFont);
-  font-weight: 700;
-  color: #272727;
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 1.5rem;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink);
 }
 
-// Menlo: site title, breadcrumbs, captions, file tree
+// ### subheadings (Surveys, Ethical Questions, References, etc.)
+article h3,
+article h4,
+article h5,
+article h6 {
+  font-family: var(--bodyFont);
+  font-weight: 400;
+  font-size: 1.1rem;
+  line-height: 1.5rem;
+  font-style: italic;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--ink);
+}
+
+article p,
+article li,
+article td {
+  line-height: 1.5rem;
+}
+
+// ----------------------------------------------------------------------------
+//  Content meta line: date + reading time (left), author (right), in Menlo
+// ----------------------------------------------------------------------------
+.content-meta {
+  width: 100%;
+  max-width: 100%;
+  margin: 0.25rem 0 2.75rem;
+  display: flex;
+  gap: 1.25rem;
+  align-items: baseline;
+  font-family: var(--codeFont);
+  font-size: 0.8rem;
+  line-height: 1rem;
+  color: var(--ink);
+
+  * {
+    font-family: var(--codeFont);
+    font-size: 0.8rem;
+    color: var(--ink);
+  }
+
+  .meta-author {
+    margin-left: auto;
+  }
+}
+
+// ----------------------------------------------------------------------------
+//  Menlo zones: captions, file tree
+// ----------------------------------------------------------------------------
 .page-title,
 .page-title a,
-.breadcrumb-container,
-.explorer,
-.explorer ul,
-.explorer li,
-.explorer a,
-#explorer-content,
 p > img + em,
 article p:has(img) em {
   font-family: var(--codeFont);
+  font-size: 0.8rem;
+  font-weight: 400;
+  line-height: 1rem;
 }
 
-.page-title,
-.page-title a {
-  font-weight: 700;
-  color: #272727;
+// ----------------------------------------------------------------------------
+//  Layout: single centred 620px column; left margin holds the fixed tree.
+// ----------------------------------------------------------------------------
+.page {
+  max-width: none;
+  margin: 0;
 }
 
+.page > #quartz-body {
+  display: block;
+  padding: 0 var(--fig-space) 0 var(--tree-reserve);
+
+  @media (max-width: 999px) {
+    padding: 0 1rem;
+  }
+}
+
+// hide both sidebars (explorer chrome + dark-mode toggle) — tree is rendered
+// separately and pinned to the window by nav-tree.js
+.sidebar.left,
+.sidebar.right {
+  display: none;
+}
+
+.page > #quartz-body .center {
+  max-width: var(--col);
+  min-width: 0;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  overflow: visible;
+}
+
+.center > article {
+  width: 100%;
+  position: relative;
+}
+
+// the markdown body wrapper is the positioning context for figures + leader svg
+.center article .markdown-preview-view,
+.center article .markdown-rendered {
+  position: relative;
+  overflow: visible;
+}
+
+// ----------------------------------------------------------------------------
+//  Captions
+// ----------------------------------------------------------------------------
 p > img + em,
 article p:has(img) em {
   display: block;
-  font-size: 0.85rem;
   font-style: normal;
   text-align: center;
-  color: #272727;
+  color: var(--ink);
+  margin-top: 0;
+  padding-top: 0;
 }
 
-// images: inline, centred, max 35vh (except album grids below)
 article img {
   display: block;
   max-height: 35vh;
@@ -87,9 +196,74 @@ article img {
   height: auto;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
-// album collections: two floating rows, tight columns / wider row spacing
+article p:has(img) {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+article p:has(> img) + p:has(em),
+article p:has(img) + p > em {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+// ----------------------------------------------------------------------------
+//  Caption boxes (figures + album artwork)
+// ----------------------------------------------------------------------------
+article .blowout-cap {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0.5rem 0 0;
+  padding: var(--cap-pad);
+  border: 1px solid var(--cap-border);
+  background: rgba(242, 242, 242, 0.8);
+  opacity: 0.8;
+
+  em {
+    display: block;
+    font-family: var(--codeFont);
+    font-size: 0.64rem;
+    line-height: var(--cap-lh);
+    font-style: italic;
+    font-weight: 400;
+    text-align: center;
+    color: rgba(39, 39, 39, 0.8);
+    margin: 0;
+  }
+}
+
+// ----------------------------------------------------------------------------
+//  Figure captions: image centred, caption box beneath
+// ----------------------------------------------------------------------------
+.center figure.blowout {
+  margin: 1.75rem 0;
+  padding: 0;
+  width: 100%;
+
+  .blowout-img {
+    margin: 0;
+    padding: 0;
+  }
+
+  img {
+    display: block;
+    margin: 0 auto;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 45vh;
+    border: none;
+    border-radius: 0;
+  }
+}
+
+// ----------------------------------------------------------------------------
+//  Album collections (artwork tables)
+// ----------------------------------------------------------------------------
 article .table-container:has(img) {
   --album-col-gap: 0.25rem;
   --album-row-gap: 0.65rem;
@@ -135,34 +309,23 @@ article table:has(img) {
   }
 }
 
-// figure caption directly below album collections — same Menlo style as image captions
-article .table-container:has(img) + p > em,
-article .table-container:has(img) + p em {
-  font-family: var(--codeFont);
-  display: block;
-  font-size: 0.85rem;
-  font-style: normal;
-  text-align: center;
-  color: #272727;
-  margin: 0.35rem auto 0;
-}
-
-// reference list + body: keep author names and italics at full contrast
+// ----------------------------------------------------------------------------
+//  Body emphasis / dark-mode pinning
+// ----------------------------------------------------------------------------
 article strong,
 article p > strong {
-  color: #272727;
+  color: var(--ink);
   font-weight: 700;
 }
 
 article em,
 article p {
-  color: #272727;
+  color: var(--ink);
 }
 
-// dark-mode toggle inverts --dark to a light colour; pin ink on our paper bg
 :root[saved-theme="dark"] body {
-  background-color: #f2f2f2;
-  color: #272727;
+  background-color: var(--paper);
+  color: var(--ink);
 }
 
 :root[saved-theme="dark"] article strong,
@@ -170,79 +333,255 @@ article p {
 :root[saved-theme="dark"] article em,
 :root[saved-theme="dark"] article p,
 :root[saved-theme="dark"] article a {
-  color: #272727;
+  color: var(--ink);
 }
 
-// reading progress — vertical, top-right, centred, max 70vh, labelled in Menlo
-.reading-progress {
+// ============================================================================
+//  Left rail — custom ASCII tree (rendered by nav-tree.js into .ascii-tree)
+// ============================================================================
+.ascii-tree {
   position: fixed;
-  top: 50%;
-  right: 2rem;
-  transform: translateY(-50%);
-  max-height: 70vh;
-  height: 70vh;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  z-index: 200;
-  pointer-events: none;
-  align-items: flex-end;
+  top: 2rem;
+  left: 2rem;
+  z-index: 100;
+  font-family: var(--codeFont);
+  font-size: 0.8rem;
+  font-weight: 400;
+  line-height: 1rem;
+  color: var(--ink);
+  white-space: pre;
+  overflow: visible;
+  max-width: none;
+  max-height: none;
+  pointer-events: auto;
 
-  @media all and ($mobile) {
-    right: 1rem;
-    max-height: 60vh;
-    height: 60vh;
+  @media (max-width: 999px) {
+    position: static;
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    z-index: auto;
+    margin: 0 auto 2rem;
+    padding: 1.5rem 0 0;
   }
 }
 
-// break holds the label; the trailing "-" aligns with the gap below
-.reading-progress__break {
-  flex: none;
-  height: 6px;
+// mobile: fixed back-to-top control (ascii arrow in a square border)
+.back-to-top {
+  display: none;
+}
+
+@media (max-width: 999px) {
+  .back-to-top {
+    display: flex;
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 100;
+    width: 2.5rem;
+    height: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    font-family: var(--codeFont);
+    font-size: 1rem;
+    line-height: 1;
+    font-weight: 400;
+    color: var(--ink);
+    text-decoration: none;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+  }
+}
+
+.ascii-tree,
+.ascii-row,
+.ascii-row .g,
+.ascii-row a,
+.ascii-row .lbl,
+.ascii-row.is-root a {
+  font-weight: 400 !important; // force regular everywhere in the tree
+}
+
+.ascii-row {
   display: flex;
+  align-items: flex-start;
+  white-space: pre;
+  min-height: 0;
+  margin-bottom: 1px; // small gap between every row
+}
+
+.ascii-row .g {
+  white-space: pre;
+  flex: none;
+}
+
+.ascii-row a,
+.ascii-row .lbl {
+  color: var(--ink);
+  text-decoration: none;
+  white-space: pre;
+}
+
+.ascii-row a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ascii-row.is-root a {
+  font-weight: 400;
+}
+
+// section + page rows carry the reading indicator
+.ascii-row.toc-section .lbl,
+.ascii-row.nav-page .lbl {
+  display: inline-block;
+  padding: 0 0.4ch;
+  border-radius: 1px;
+}
+
+.ascii-row.toc-section.nav-read .lbl,
+.ascii-row.nav-page.nav-read .lbl {
+  background: var(--read);
+  color: var(--ink);
+}
+
+.ascii-row.toc-section.nav-current .lbl,
+.ascii-row.nav-page.nav-current .lbl {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+// ============================================================================
+//  Footer — three zones (created-by left, socials centre, Quartz/links right)
+// ============================================================================
+.page > #quartz-body footer {
+  // three columns: left block | centred logos | right block.
+  // equal 1fr gutters keep the auto middle column exactly centred on the page.
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: flex-end;
-  width: 100%;
-  padding-right: 0;
-}
-
-.reading-progress__label {
+  column-gap: 2rem;
+  margin-top: 4rem;
+  padding: 1.5rem 0;
   font-family: var(--codeFont);
-  font-size: 0.62rem;
-  font-weight: 500;
-  color: #272727;
-  opacity: 0.75;
-  white-space: nowrap;
-  text-align: right;
-  line-height: 1;
-  transform: translateY(-1px); // nudge label (and hyphen) slightly higher in the break
-  padding-right: 0.45rem;
-}
+  font-size: 0.8rem;
+  line-height: 1rem; // match ascii tree exactly
+  font-weight: 400;
+  color: var(--ink);
+  box-sizing: border-box;
 
-.reading-progress__section {
-  flex: none;
-  min-height: 4px;
-  display: flex;
-  align-items: stretch;
-  justify-content: flex-end;
-  width: 2px;
-}
+  // break out of #quartz-body padding — width must expand, not just margins.
+  @media (min-width: 1000px) {
+    width: calc(100% + var(--tree-reserve) + var(--fig-space));
+    max-width: none !important;
+    margin-left: calc(-1 * var(--tree-reserve)) !important;
+    margin-right: calc(-1 * var(--fig-space)) !important;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
 
-.reading-progress__track {
-  flex: 1;
-  width: 2px;
-  min-height: 100%;
-  background: rgba(39, 39, 39, 0.18);
-  position: relative;
-  overflow: hidden;
-}
+  &,
+  span,
+  p,
+  a,
+  li,
+  strong {
+    font-family: var(--codeFont);
+    font-size: 0.8rem;
+    line-height: 1rem;
+    font-weight: 400 !important;
+  }
 
-.reading-progress__fill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 0%;
-  background: #272727;
-  transition: height 0.08s linear;
+  a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .footer-left {
+    justify-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    text-align: left;
+  }
+
+  .footer-center {
+    justify-self: center;
+    display: flex;
+    gap: 1.1rem;
+    align-items: center;
+
+    a {
+      display: inline-flex;
+      align-items: center;
+    }
+    svg,
+    img {
+      display: block;
+    }
+    img {
+      height: 13px;
+      width: auto;
+    }
+  }
+
+  .footer-right {
+    justify-self: end;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0;
+    text-align: right;
+
+    p {
+      margin: 0;
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+    }
+
+    li {
+      margin: 0;
+    }
+  }
+
+  @media (max-width: 999px) {
+    width: 100%;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0;
+    padding-right: 0;
+    grid-template-columns: 1fr;
+    row-gap: 1.25rem;
+
+    .footer-left {
+      justify-self: start;
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .footer-center {
+      justify-self: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .footer-right {
+      justify-self: end;
+      align-items: flex-end;
+      text-align: right;
+
+      ul {
+        justify-content: flex-end;
+      }
+    }
+  }
 }

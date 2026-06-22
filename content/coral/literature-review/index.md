@@ -32,7 +32,7 @@ The longer we live with our collection, the stronger our relationship grows. We 
 And by dwelling in our collections we also deepen our understanding of their interrelations. Polanyi suggests that our relationship towards individual albums (or songs) shifts from seeing them as discrete musical works to understanding how they might fit contextually into the rest of our music collection. DJs put this into practice when they 'select' a song during a set.
 
 ![[af6b7006-3cd1-4413-b8ba-6eb0461c4f1a-1-102-o.jpeg]]
-*Sasaki, Rina. (2026). [Cameron DJing at Shady Lady, Fitzroy]. Courtesy of the Artist.
+*Sasaki, Rina. (2026). [Cameron DJing at Shady Lady, Fitzroy]. Courtesy of the Artist.*
 
 Masterful track selection demands what Bourdieu (1984) calls 'cultural competence'. The crowd, the music and the DJ are in conversation with one another. As the room slips into different grooves, the DJ watches the ebb and flow of the crowd's energy and responds with the next record. The DJ has intimate knowledge of their music collection, and through this knowledge they are able to shape this unfolding conversation - "the capacity to see (*voir*) is a function of the knowledge (*savoir*)" (Bourdieu, 1984, p.2).
 
@@ -133,8 +133,7 @@ This constructed narrative provides an insight into our listening tastes, but th
 
 Van Dijck provides a framework to unpack the social underpinnings of this distaste. Online ecosystems have shifted from prioritising *connectedness* to *connectivity*. MySpace allowed for *connectedness* by giving us shelves and online meeting spaces, Spotify's interests are in *connectivity*: recommendations, Spotify music in your Instagram stories, engagement statistics. It feels customised for you without requiring any input.
 
-"Customization seems to have become less the art of soliciting customers’ needs than
-the science of engineering their desires." (van Dijck, 2013, p.170)
+"Customization seems to have become less the art of soliciting customers’ needs than the science of engineering their desires." (van Dijck, 2013, p.170)
 
 Streaming services aren't a representation of our music tastes, they are a simulation of them.
 
