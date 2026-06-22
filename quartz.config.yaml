@@ -225,7 +225,7 @@ plugins:
     layout:
       position: afterBody
       priority: 10
-  - source: github:quartz-community/footer
+  - source: ./plugins-local/footer
     enabled: true
     options:
       links:
